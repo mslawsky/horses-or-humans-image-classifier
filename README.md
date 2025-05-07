@@ -1,4 +1,4 @@
-# Horses vs Humans Image Classifier 🐴👨
+# Horses vs Humans Image Classifier 🐴🤷
 
 [![TensorFlow](https://img.shields.io/badge/TensorFlow-2.x-orange.svg)](https://www.tensorflow.org/)
 [![Python](https://img.shields.io/badge/Python-3.6+-blue.svg)](https://www.python.org/)
@@ -8,7 +8,7 @@
 
 This repository contains a convolutional neural network (CNN) implementation for classifying images of horses and humans using TensorFlow and Keras. The project demonstrates the effect of image size on model training and performance.
 
-![Horse vs Human Examples](https://github.com/tensorflow/datasets/raw/master/tensorflow_datasets/image_classification/horses_or_humans/figure/horses_or_humans.png)
+![Horse vs Human Examples](horses-or-humans.png)
 
 ---
 
@@ -151,7 +151,7 @@ The model starts to show signs of overfitting around epoch 5, where training acc
 The repository includes code for various visualizations to help understand model performance and behavior:
 
 ### Training Metrics
-![Training Accuracy Curve](https://raw.githubusercontent.com/yourusername/horses-vs-humans-classifier/main/images/accuracy_curve.png)
+![Training Accuracy Curve](accuracy-curve.png)
 *Example visualization showing training and validation accuracy across epochs*
 
 ### Intermediate Layer Activations
@@ -187,7 +187,7 @@ for layer_name, feature_map in zip(layer_names, successive_feature_maps):
 ### Interactive Predictions
 The notebook contains an interactive widget for uploading and classifying new images:
 
-![Prediction Widget](https://raw.githubusercontent.com/yourusername/horses-vs-humans-classifier/main/images/prediction_widget.png)
+![Prediction Widget](prediction-widget.png)
 *Example of the prediction widget interface*
 
 ## Getting Started 🚀
