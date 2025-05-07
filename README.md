@@ -1,4 +1,4 @@
-# Horses vs Humans Image Classifier 🐴🤷
+# Horses or Humans Image Classifier 🐴🤷
 
 [![TensorFlow](https://img.shields.io/badge/TensorFlow-2.x-orange.svg)](https://www.tensorflow.org/)
 [![Python](https://img.shields.io/badge/Python-3.6+-blue.svg)](https://www.python.org/)
@@ -8,7 +8,7 @@
 
 This repository contains a convolutional neural network (CNN) implementation for classifying images of horses and humans using TensorFlow and Keras. The project demonstrates the effect of image size on model training and performance.
 
-![Horse vs Human Examples](horses-or-humans.png)
+![Horse or Human Examples](horses-or-humans.png)
 
 ---
 
