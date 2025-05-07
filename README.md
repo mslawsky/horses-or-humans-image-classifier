@@ -1,4 +1,4 @@
-# Horses or Humans Image Classifier 🐴🤷
+# Horses vs Humans Image Classifier 🐴👨
 
 [![TensorFlow](https://img.shields.io/badge/TensorFlow-2.x-orange.svg)](https://www.tensorflow.org/)
 [![Python](https://img.shields.io/badge/Python-3.6+-blue.svg)](https://www.python.org/)
@@ -8,7 +8,7 @@
 
 This repository contains a convolutional neural network (CNN) implementation for classifying images of horses and humans using TensorFlow and Keras. The project demonstrates the effect of image size on model training and performance.
 
-![Horse or Human Examples](horses-or-humans.png)
+![Horse vs Human Examples](https://github.com/tensorflow/datasets/raw/master/tensorflow_datasets/image_classification/horses_or_humans/figure/horses_or_humans.png)
 
 ---
 
@@ -151,7 +151,7 @@ The model starts to show signs of overfitting around epoch 5, where training acc
 The repository includes code for various visualizations to help understand model performance and behavior:
 
 ### Training Metrics
-![Training Accuracy Curve](accuracy-curve.png)
+![Training Accuracy Curve](https://raw.githubusercontent.com/yourusername/horses-vs-humans-classifier/main/images/accuracy_curve.png)
 *Example visualization showing training and validation accuracy across epochs*
 
 ### Intermediate Layer Activations
@@ -187,147 +187,8 @@ for layer_name, feature_map in zip(layer_names, successive_feature_maps):
 ### Interactive Predictions
 The notebook contains an interactive widget for uploading and classifying new images:
 
-![Prediction Widget](prediction-widget.png)
+![Prediction Widget](https://raw.githubusercontent.com/yourusername/horses-vs-humans-classifier/main/images/prediction_widget.png)
 *Example of the prediction widget interface*
-
-import React, { useState } from 'react';
-import { Camera } from 'lucide-react';
-
-const PredictionWidget = () => {
-  const [selectedImage, setSelectedImage] = useState(null);
-  const [prediction, setPrediction] = useState(null);
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
-  
-  // Example predictions for demo purposes
-  const examplePredictions = {
-    horse: {
-      label: "Horse",
-      confidence: 0.976,
-      explanation: "The model identified features such as the distinctive body shape, mane, and facial structure consistent with horses."
-    },
-    human: {
-      label: "Human",
-      confidence: 0.934,
-      explanation: "The model detected characteristic human features including body proportions, facial structure, and posture."
-    }
-  };
-  
-  const onImageSelected = (e) => {
-    if (e.target.files && e.target.files[0]) {
-      setSelectedImage(URL.createObjectURL(e.target.files[0]));
-      setIsAnalyzing(true);
-      
-      // Simulate prediction delay
-      setTimeout(() => {
-        // For demo, randomly choose horse or human prediction
-        const predictionType = Math.random() > 0.5 ? 'horse' : 'human';
-        setPrediction(examplePredictions[predictionType]);
-        setIsAnalyzing(false);
-      }, 1500);
-    }
-  };
-  
-  return (
-    <div className="flex flex-col items-center p-6 max-w-2xl mx-auto bg-white rounded-lg shadow-md">
-      <h2 className="text-2xl font-bold mb-6">Horse or Human Classifier</h2>
-      
-      <div className="w-full mb-6">
-        <div className="flex items-center justify-center w-full">
-          <label className="flex flex-col items-center justify-center w-full h-64 border-2 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
-            <div className="flex flex-col items-center justify-center pt-5 pb-6">
-              <Camera size={48} className="mb-3 text-gray-400" />
-              <p className="mb-2 text-sm text-gray-500"><span className="font-semibold">Click to upload</span> or drag and drop</p>
-              <p className="text-xs text-gray-500">PNG, JPG or JPEG (max. 4MB)</p>
-            </div>
-            <input 
-              type="file" 
-              className="hidden" 
-              accept="image/*"
-              onChange={onImageSelected}
-            />
-          </label>
-        </div>
-      </div>
-      
-      {selectedImage && (
-        <div className="mb-6 flex flex-col items-center">
-          <div className="w-full max-w-md overflow-hidden rounded-lg border border-gray-200">
-            <img 
-              src={selectedImage} 
-              alt="Selected" 
-              className="w-full h-auto object-contain"
-            />
-          </div>
-        </div>
-      )}
-      
-      {isAnalyzing && (
-        <div className="flex flex-col items-center mt-4 mb-6">
-          <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-2"></div>
-          <p>Analyzing image...</p>
-        </div>
-      )}
-      
-      {prediction && !isAnalyzing && (
-        <div className="w-full bg-gray-50 rounded-lg p-6 mt-2">
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="text-xl font-bold">Prediction Result</h3>
-            <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-              prediction.label === "Horse" ? "bg-purple-100 text-purple-800" : "bg-green-100 text-green-800"
-            }`}>
-              {prediction.label}
-            </span>
-          </div>
-          
-          <div className="mb-4">
-            <div className="flex justify-between mb-1">
-              <span className="text-sm font-medium">Confidence</span>
-              <span className="text-sm font-medium">{(prediction.confidence * 100).toFixed(1)}%</span>
-            </div>
-            <div className="w-full bg-gray-200 rounded-full h-2.5">
-              <div 
-                className={`h-2.5 rounded-full ${prediction.label === "Horse" ? "bg-purple-600" : "bg-green-600"}`}
-                style={{ width: `${prediction.confidence * 100}%` }}
-              ></div>
-            </div>
-          </div>
-          
-          <p className="text-gray-700 mt-2">{prediction.explanation}</p>
-          
-          <div className="mt-6 flex items-center justify-between">
-            <button 
-              onClick={() => {setSelectedImage(null); setPrediction(null);}}
-              className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300"
-            >
-              Try Another Image
-            </button>
-            
-            <div className="text-sm text-gray-500">
-              Model version: v1.0.0
-            </div>
-          </div>
-        </div>
-      )}
-      
-      <div className="w-full mt-8 border-t pt-6">
-        <h3 className="font-semibold mb-2">About this model:</h3>
-        <p className="text-gray-700 text-sm mb-4">
-          This CNN model was trained on the Horses vs Humans dataset with 150x150 pixel images. 
-          It features 3 convolutional layers followed by max pooling and dense layers, achieving 
-          ~87% accuracy on validation data.
-        </p>
-        <p className="text-xs text-gray-500">
-          Note: This is a demonstration interface. In a real application, predictions would be 
-          processed by the actual trained model.
-        </p>
-      </div>
-    </div>
-  );
-};
-
-export default PredictionWidget;
-
----
 
 ## Getting Started 🚀
 
@@ -417,6 +278,10 @@ Using smaller images (150×150) provides nearly the same accuracy with 75% fewer
 
 ---
 
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
 ## Acknowledgments 🙏
 
 - The dataset is provided as part of the ["TensorFlow in Practice" specialization on Coursera](https://www.coursera.org/specializations/tensorflow-in-practice)
@@ -424,6 +289,3 @@ Using smaller images (150×150) provides nearly the same accuracy with 75% fewer
 - Special thanks to the deep learning community for their valuable resources and tutorials
 - Image examples courtesy of the [TensorFlow Datasets repository](https://github.com/tensorflow/datasets)
 
-
-- The dataset is provided as part of the "TensorFlow in Practice" specialization on Coursera
-- Inspired by the work of the TensorFlow team and the deep learning community
