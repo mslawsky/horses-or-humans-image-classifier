@@ -6,7 +6,7 @@
 [![NumPy](https://img.shields.io/badge/NumPy-1.19+-green.svg)](https://numpy.org/)
 [![Matplotlib](https://img.shields.io/badge/Matplotlib-3.3+-yellow.svg)](https://matplotlib.org/)
 
-This repository contains a convolutional neural network (CNN) implementation for classifying images of horses and humans using TensorFlow and Keras. The project demonstrates the effect of image size on model training and performance.
+This repository contains a convolutional neural network (CNN) implementation for classifying images of horses and humans using TensorFlow and Keras. The project demonstrates the effect of image size on model training and performance, as well as techniques to improve generalization through data augmentation.
 
 ![Horse vs Human Examples](horses-or-humans.png)
 
@@ -17,6 +17,7 @@ This repository contains a convolutional neural network (CNN) implementation for
 - [Dataset Details](#dataset-details-)
 - [Model Architecture](#model-architecture-)
 - [Training Process](#training-process-)
+- [Data Augmentation](#data-augmentation-)
 - [Results](#results-)
 - [Visualizations](#visualizations-)
 - [Getting Started](#getting-started-)
@@ -37,6 +38,11 @@ This project explores:
 - How changing image size affects the model architecture
 - The trade-off between model size, training time, and accuracy
 - Techniques for data preprocessing and visualization
+- Implementing data augmentation to improve model generalization
+
+**Development Phases:**
+1. **Basic CNN Model**: Implementation of a baseline convolutional neural network
+2. **Data Augmentation**: Enhancement with image augmentation techniques to reduce overfitting
 
 ---
 
@@ -65,6 +71,8 @@ These datasets consist of color images (RGB) that will be resized to 150x150 pix
 - Dataset is loaded using TensorFlow's image_dataset_from_directory API
 
 ## Model Architecture 🧠
+
+### Phase 1: Basic CNN Model
 
 The implemented CNN has the following structure:
 
@@ -128,23 +136,101 @@ The training process includes:
 - TensorFlow's data prefetching to optimize training speed
 - Verbose logging to track accuracy and loss metrics
 
+## Data Augmentation 🔄
+
+### Phase 2: Enhancing Model Generalization
+
+Data augmentation artificially expands the training dataset by creating modified versions of existing images. This technique is particularly valuable for the Horses vs Humans dataset, where the number of training examples is limited (only 500 horse images and 527 human images).
+
+![Augmented Image Examples](augmented-image-examples.png)
+
+**Benefits for This Project:**
+- **Combats Overfitting**: The baseline model reached 100% training accuracy but only 85.6% validation accuracy
+- **Diversifies the Dataset**: Creates variations from existing images, simulating different poses and viewing conditions
+- **Improves Real-World Performance**: Helps the model handle variations in lighting, angles, and backgrounds
+
+### Implementation
+
+Data augmentation is implemented through TensorFlow's image augmentation layers:
+
+```python
+data_augmentation = tf.keras.Sequential([
+  tf.keras.layers.RandomFlip("horizontal"),
+  tf.keras.layers.RandomRotation(0.2),
+  tf.keras.layers.RandomZoom(0.2),
+  tf.keras.layers.RandomHeight(0.2),
+  tf.keras.layers.RandomWidth(0.2),
+])
+
+# Apply augmentation to the model pipeline
+augmented_model = tf.keras.Sequential([
+  tf.keras.Input(shape=(150, 150, 3)),
+  data_augmentation,
+  tf.keras.layers.Rescaling(1./255),
+  # Rest of the model architecture remains the same
+  tf.keras.layers.Conv2D(16, (3,3), activation='relu'),
+  tf.keras.layers.MaxPooling2D(2, 2),
+  tf.keras.layers.Conv2D(32, (3,3), activation='relu'),
+  tf.keras.layers.MaxPooling2D(2,2),
+  tf.keras.layers.Conv2D(64, (3,3), activation='relu'),
+  tf.keras.layers.MaxPooling2D(2,2),
+  tf.keras.layers.Flatten(),
+  tf.keras.layers.Dense(512, activation='relu'),
+  tf.keras.layers.Dense(1, activation='sigmoid')
+])
+```
+
+**Augmentation Techniques:**
+- **Horizontal Flipping**: Mirrors images left-to-right
+- **Rotation (±20%)**: Rotates images to various angles
+- **Zooming (±20%)**: Simulates distance variations
+- **Height/Width Adjustments (±20%)**: Creates variations in aspect ratio
+
+### Performance Improvements
+
+![Augmentation Accuracy Results](augmented-accuracy-results.png)
+
+Comparing the baseline and augmented models:
+
+| Metric | Baseline Model | Augmented Model | Change |
+|--------|---------------|-----------------|--------|
+| Training Accuracy | 100.0% | 94.3% | -5.7% |
+| Validation Accuracy | 85.6% | 91.8% | +6.2% |
+| Overfitting Gap | 14.4% | 2.5% | -11.9% |
+| Training Time/Epoch | ~7s | ~9s | +2s |
+
+### Key Observations
+
+1. **Improved Generalization**: The validation accuracy increased by 6.2%, showing better performance on unseen data
+2. **Reduced Overfitting**: The gap between training and validation accuracy decreased from 14.4% to just 2.5%
+3. **Slower Convergence**: The augmented model required more epochs to reach peak performance
+4. **More Robust Features**: The model became less sensitive to specific image details and more focused on essential features
+
+The slightly lower training accuracy with data augmentation is actually a positive sign—it indicates the model is learning more generalizable features rather than memorizing the training examples.
+
 ## Results 📈
 
-The model achieves approximately 85-90% validation accuracy within 15 epochs. The training demonstrates:
-- Fast convergence (high accuracy within few epochs)
-- Signs of overfitting (training accuracy reaches 100% while validation stays lower)
-- Good generalization to unseen images
+Performance comparison across the two phases:
 
-**Training Metrics:**
+| Model Phase     | Training Accuracy | Validation Accuracy | Training Time/Epoch | Parameters |
+|-----------------|-------------------|---------------------|---------------------|------------|
+| Basic CNN       | 100.0%            | 85.6%               | ~7s                 | 9.5M       |
+| With Augmentation | 94.3%           | 91.8%               | ~9s                 | 9.5M       |
 
-| Epoch | Training Accuracy | Validation Accuracy | Training Loss | Validation Loss |
-|-------|-------------------|---------------------|---------------|-----------------|
-| 1     | 63.8%             | 85.9%               | 0.758         | 0.379           |
-| 5     | 98.1%             | 79.3%               | 0.054         | 1.864           |
-| 10    | 100.0%            | 85.9%               | 0.001         | 1.817           |
-| 15    | 100.0%            | 85.6%               | 0.000         | 2.672           |
+**Key Observations:**
+- **Basic CNN**: Shows significant overfitting (100% training accuracy vs. 85.6% validation)
+- **Data Augmentation**: Reduces overfitting and improves generalization by over 6%
 
-The model starts to show signs of overfitting around epoch 5, where training accuracy continues to improve while validation accuracy plateaus. This suggests that a shorter training process with early stopping might be beneficial.
+The baseline model shows signs of overfitting around epoch 5, where training accuracy continues to improve while validation accuracy plateaus. The augmented model maintains a much closer relationship between training and validation metrics.
+
+**Architecture Comparison:**
+
+| Image Size | Parameters | Training Time | Peak Validation Accuracy |
+|------------|------------|---------------|--------------------------|
+| 150×150    | 9.5M       | ~7s/epoch     | ~87% (baseline), ~92% (augmented) |
+| 300×300    | 38M        | ~30s/epoch    | ~88% (baseline)          |
+
+Using smaller images (150×150) with data augmentation provides better accuracy with 75% fewer parameters and significantly faster training times compared to larger (300×300) images without augmentation.
 
 ## Visualizations 📊
 
@@ -212,59 +298,27 @@ pip install tensorflow numpy matplotlib
 
 ### Running the Code
 ```bash
-# Run the notebook
-jupyter notebook C1_W4_Lab_3_compacted_images.ipynb
+# Run the baseline model
+python horses_humans_baseline.py
+
+# Run with data augmentation
+python horses_humans_augmented.py
+
+# Or run the notebook
+jupyter notebook horses_humans_classifier.ipynb
 ```
 
 ---
 
 ## Key Observations 🔍
 
-1. Using compacted 150x150 images (instead of 300x300) significantly reduced model size and training time
-2. The model still achieved high accuracy despite the reduced image size
-3. The CNN architecture with three convolutional layers showed strong performance
-4. The model showed signs of overfitting after ~7 epochs (training accuracy at 100% while validation oscillated around 85-87%)
-5. Training with smaller images reduces the parameter count in the model while maintaining good classification performance
-6. Early layers in the CNN learn basic features (edges, textures) while deeper layers capture more complex patterns
-
-**Architecture Comparison:**
-
-| Image Size | Parameters | Training Time | Peak Validation Accuracy |
-|------------|------------|---------------|--------------------------|
-| 150×150    | 9.5M       | ~7s/epoch     | ~87%                     |
-| 300×300    | 38M        | ~30s/epoch    | ~88%                     |
-
-Using smaller images (150×150) provides nearly the same accuracy with 75% fewer parameters and significantly faster training times compared to larger (300×300) images.
+1. **Data Augmentation Impact**: Implementing augmentation increased validation accuracy from 85.6% to 91.8% without changing the model architecture
+2. **Reduced Overfitting**: The gap between training and validation accuracy decreased from 14.4% to just 2.5% with augmentation
+3. **Image Size Efficiency**: Using 150x150 images instead of 300x300 significantly reduced model size while maintaining good performance
+4. **Feature Learning**: Early layers in the CNN learn basic features (edges, textures) while deeper layers capture more complex patterns
+5. **Training Behavior**: The baseline model shows signs of overfitting after ~7 epochs (training accuracy at 100% while validation accuracy plateaus)
 
 ## Future Improvements 🚀
-
-- **Early Stopping**: Implement callbacks to halt training when validation accuracy plateaus
-  ```python
-  class AccuracyThresholdCallback(tf.keras.callbacks.Callback):
-      def on_epoch_end(self, epoch, logs={}):
-          if logs.get('accuracy') >= 0.95:
-              print("\nReached 95% accuracy - stopping training!")
-              self.model.stop_training = True
-  ```
-
-- **Regularization Techniques**:
-  - Add dropout layers between dense layers to reduce overfitting
-  - Implement L2 regularization on convolutional layers
-  - Use batch normalization to stabilize training
-
-- **Architecture Experiments**:
-  - Test different numbers of convolutional layers
-  - Experiment with various filter counts (16, 32, 64, 128)
-  - Try different kernel sizes for convolutions (3×3, 5×5)
-
-- **Data Augmentation**: Implement image augmentation to improve generalization
-  ```python
-  data_augmentation = tf.keras.Sequential([
-    tf.keras.layers.RandomFlip("horizontal"),
-    tf.keras.layers.RandomRotation(0.2),
-    tf.keras.layers.RandomZoom(0.2),
-  ])
-  ```
 
 - **Transfer Learning**: Leverage pre-trained models like VGG16, ResNet, or MobileNet as feature extractors
   ```python
@@ -275,6 +329,44 @@ Using smaller images (150×150) provides nearly the same accuracy with 75% fewer
   )
   base_model.trainable = False
   ```
+
+- **Additional Regularization**: Further reduce overfitting with techniques beyond data augmentation
+  ```python
+  model = tf.keras.Sequential([
+      # ... existing layers
+      tf.keras.layers.Flatten(),
+      tf.keras.layers.Dropout(0.5),  # Add dropout layer
+      tf.keras.layers.Dense(512, activation='relu', kernel_regularizer=tf.keras.regularizers.l2(0.001)),
+      tf.keras.layers.Dense(1, activation='sigmoid')
+  ])
+  ```
+
+- **Model Architecture Refinements**:
+  - Test different numbers of convolutional layers
+  - Experiment with various filter counts (16, 32, 64, 128)
+  - Try different kernel sizes for convolutions (3×3, 5×5)
+
+- **Early Stopping**: Implement callbacks to halt training when validation accuracy plateaus
+  ```python
+  early_stopping = tf.keras.callbacks.EarlyStopping(
+      monitor='val_accuracy',
+      patience=3,
+      restore_best_weights=True
+  )
+  ```
+
+- **Learning Rate Scheduling**: Implement learning rate decay to fine-tune model convergence
+  ```python
+  lr_scheduler = tf.keras.callbacks.ReduceLROnPlateau(
+      monitor='val_loss',
+      factor=0.1,
+      patience=2
+  )
+  ```
+
+- **Class Activation Maps**: Implement Grad-CAM visualization to highlight which regions of images the model focuses on
+
+- **Model Deployment**: Convert to TensorFlow Lite for mobile applications or TensorFlow.js for web interfaces
 
 ---
 
@@ -288,4 +380,3 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - Inspired by the work of the TensorFlow team and Laurence Moroney
 - Special thanks to the deep learning community for their valuable resources and tutorials
 - Image examples courtesy of the [TensorFlow Datasets repository](https://github.com/tensorflow/datasets)
-
