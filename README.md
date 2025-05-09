@@ -276,37 +276,50 @@ The notebook contains an interactive widget for uploading and classifying new im
 ![Prediction Widget](prediction-widget.png)
 *Example of the prediction widget interface*
 
-## Getting Started 🚀
+---
 
-### Prerequisites
-- Python 3.x
-- TensorFlow 2.x
-- NumPy
-- Matplotlib
+## Transfer Learning 🚀
 
-### Installation
-```bash
-# Clone this repository
-git clone https://github.com/yourusername/horses-vs-humans-classifier.git
+### Phase 3: Leveraging Pre-trained Knowledge
 
-# Navigate to project directory
-cd horses-vs-humans-classifier
+Transfer learning represents the most advanced approach in this project, using InceptionV3 (a model pre-trained on ImageNet) to achieve superior results with minimal training time.
 
-# Install dependencies
-pip install tensorflow numpy matplotlib
+```python
+def create_transfer_learning_model(pre_trained_model, last_output):
+    # Flatten the output layer of the pretrained model
+    x = tf.keras.layers.Flatten()(last_output)
+    
+    # Add custom classification layers
+    x = tf.keras.layers.Dense(1024, activation='relu')(x)
+    x = tf.keras.layers.Dropout(0.2)(x)
+    x = tf.keras.layers.Dense(1, activation='sigmoid')(x)
+    
+    # Create the complete model
+    model = tf.keras.Model(inputs=pre_trained_model.input, outputs=x)
+    
+    # Compile with a very low learning rate
+    model.compile(
+        optimizer=tf.keras.optimizers.RMSprop(learning_rate=0.00001),
+        loss='binary_crossentropy',
+        metrics=['accuracy']
+    )
+    
+    return model
 ```
 
-### Running the Code
-```bash
-# Run the baseline model
-python horses_humans_baseline.py
+**Implementation Highlights:**
+* **Feature Extraction**: Uses the 'mixed7' layer from InceptionV3 as a sophisticated feature extractor
+* **Frozen Base Model**: All pre-trained layers are kept non-trainable to preserve learned features
+* **Minimal Custom Layers**: Just three additional layers are needed on top of the pre-trained model
+* **Specialized Preprocessing**: Images are prepared specifically for InceptionV3 using its dedicated preprocessing function
 
-# Run with data augmentation
-python horses_humans_augmented.py
+**Performance Improvements:**
+* **Superior Accuracy**: 98.5% validation accuracy (6.7% improvement over the augmented model)
+* **Ultra-Fast Convergence**: Reaches optimal performance in less than 5 epochs
+* **Excellent Generalization**: Minimal gap between training and validation metrics, showing robust learning
+* **Resource Efficiency**: Despite having more parameters (47.5M total, 38.5M trainable), the model trains faster due to knowledge transfer
 
-# Or run the notebook
-jupyter notebook horses_humans_classifier.ipynb
-```
+This approach demonstrates how modern deep learning can achieve state-of-the-art results efficiently by building upon pre-trained models rather than starting from scratch.
 
 ---
 
