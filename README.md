@@ -18,13 +18,11 @@ This repository contains a convolutional neural network (CNN) implementation for
 - [Model Architecture](#model-architecture-)
 - [Training Process](#training-process-)
 - [Data Augmentation](#data-augmentation-)
+- [Transfer Learning](#transfer-learning-)
 - [Results](#results-)
 - [Visualizations](#visualizations-)
-- [Getting Started](#getting-started-)
 - [Key Observations](#key-observations-)
 - [Future Improvements](#future-improvements-)
-- [Contact](#contact-)
-- [License](#license-)
 - [Acknowledgments](#acknowledgments-)
 
 ---
