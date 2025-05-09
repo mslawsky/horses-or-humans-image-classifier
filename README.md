@@ -136,6 +136,8 @@ The training process includes:
 - TensorFlow's data prefetching to optimize training speed
 - Verbose logging to track accuracy and loss metrics
 
+---
+
 ## Data Augmentation 🔄
 
 ### Phase 2: Enhancing Model Generalization
@@ -208,74 +210,6 @@ Comparing the baseline and augmented models:
 
 The slightly lower training accuracy with data augmentation is actually a positive sign—it indicates the model is learning more generalizable features rather than memorizing the training examples.
 
-## Results 📈
-
-Performance comparison across the two phases:
-
-| Model Phase     | Training Accuracy | Validation Accuracy | Training Time/Epoch | Parameters |
-|-----------------|-------------------|---------------------|---------------------|------------|
-| Basic CNN       | 100.0%            | 85.6%               | ~7s                 | 9.5M       |
-| With Augmentation | 94.3%           | 91.8%               | ~9s                 | 9.5M       |
-
-**Key Observations:**
-- **Basic CNN**: Shows significant overfitting (100% training accuracy vs. 85.6% validation)
-- **Data Augmentation**: Reduces overfitting and improves generalization by over 6%
-
-The baseline model shows signs of overfitting around epoch 5, where training accuracy continues to improve while validation accuracy plateaus. The augmented model maintains a much closer relationship between training and validation metrics.
-
-**Architecture Comparison:**
-
-| Image Size | Parameters | Training Time | Peak Validation Accuracy |
-|------------|------------|---------------|--------------------------|
-| 150×150    | 9.5M       | ~7s/epoch     | ~87% (baseline), ~92% (augmented) |
-| 300×300    | 38M        | ~30s/epoch    | ~88% (baseline)          |
-
-Using smaller images (150×150) with data augmentation provides better accuracy with 75% fewer parameters and significantly faster training times compared to larger (300×300) images without augmentation.
-
-## Visualizations 📊
-
-The repository includes code for various visualizations to help understand model performance and behavior:
-
-### Training Metrics
-![Training Accuracy Curve](accuracy-curve.png)
-*Example visualization showing training and validation accuracy across epochs*
-
-### Intermediate Layer Activations
-The notebook includes code to visualize what different convolutional layers are "seeing" in the images:
-
-```python
-# Display the representations
-for layer_name, feature_map in zip(layer_names, successive_feature_maps):
-  if len(feature_map.shape) == 4:
-    # Just do this for the conv / maxpool layers, not the fully-connected layers
-    n_features = feature_map.shape[-1]  # number of features in feature map
-    size = feature_map.shape[1]  # feature map shape (1, size, size, n_features)
-    
-    # Tile the images in this matrix
-    display_grid = np.zeros((size, size * n_features))
-    for i in range(n_features):
-      x = feature_map[0, :, :, i]
-      x -= x.mean()
-      x /= x.std()
-      x *= 64
-      x += 128
-      x = np.clip(x, 0, 255).astype('uint8')
-      display_grid[:, i * size : (i + 1) * size] = x
-      
-    # Display the grid
-    scale = 20. / n_features
-    plt.figure(figsize=(scale * n_features, scale))
-    plt.title(layer_name)
-    plt.grid(False)
-    plt.imshow(display_grid, aspect='auto', cmap='viridis')
-```
-
-### Interactive Predictions
-The notebook contains an interactive widget for uploading and classifying new images:
-
-![Prediction Widget](prediction-widget.png)
-*Example of the prediction widget interface*
-
 ---
 
 ## Transfer Learning 🚀
@@ -323,6 +257,82 @@ This approach demonstrates how modern deep learning can achieve state-of-the-art
 
 ---
 
+
+## Results 📈
+
+Performance comparison across all three phases:
+
+| Model Phase          | Training Accuracy | Validation Accuracy | Training Time/Epoch | Parameters                        |
+|----------------------|-------------------|---------------------|---------------------|-----------------------------------|
+| Basic CNN            | 100.0%            | 85.6%               | ~7s                 | 9.5M                              |
+| With Augmentation    | 94.3%             | 91.8%               | ~9s                 | 9.5M                              |
+| Transfer Learning    | 99.9%             | 98.5%               | ~5s                 | 38.5M trainable (47.5M total)     |
+
+**Key Observations:**
+- **Basic CNN**: Shows significant overfitting (100% training accuracy vs. 85.6% validation)
+- **Data Augmentation**: Reduces overfitting and improves generalization by over 6%
+- **Transfer Learning**: Provides the best results with 98.5% validation accuracy and faster convergence
+
+The baseline model shows signs of overfitting around epoch 5, where training accuracy continues to improve while validation accuracy plateaus. The augmented model maintains a much closer relationship between training and validation metrics. The transfer learning approach achieves the highest accuracy with minimal overfitting and faster training time.
+
+**Architecture Comparison:**
+
+| Image Size | Model Approach      | Parameters | Training Time | Peak Validation Accuracy |
+|------------|---------------------|------------|---------------|--------------------------|
+| 150×150    | Basic CNN           | 9.5M       | ~7s/epoch     | ~85.6%                   |
+| 150×150    | With Augmentation   | 9.5M       | ~9s/epoch     | ~91.8%                   |
+| 150×150    | Transfer Learning   | 47.5M      | ~5s/epoch     | ~98.5%                   |
+| 300×300    | Basic CNN           | 38M        | ~30s/epoch    | ~88% (baseline)          |
+
+Using transfer learning with smaller images (150×150) provides the best balance of accuracy and efficiency, achieving superior results compared to both the baseline and augmented models while maintaining reasonable training times.
+
+## Visualizations 📊
+
+The repository includes code for various visualizations to help understand model performance and behavior:
+
+### Training Metrics
+![Training Accuracy Curve](accuracy-curve.png)
+*Example visualization showing training and validation accuracy across epochs*
+
+### Intermediate Layer Activations
+The notebook includes code to visualize what different convolutional layers are "seeing" in the images:
+
+```python
+# Display the representations
+for layer_name, feature_map in zip(layer_names, successive_feature_maps):
+  if len(feature_map.shape) == 4:
+    # Just do this for the conv / maxpool layers, not the fully-connected layers
+    n_features = feature_map.shape[-1]  # number of features in feature map
+    size = feature_map.shape[1]  # feature map shape (1, size, size, n_features)
+    
+    # Tile the images in this matrix
+    display_grid = np.zeros((size, size * n_features))
+    for i in range(n_features):
+      x = feature_map[0, :, :, i]
+      x -= x.mean()
+      x /= x.std()
+      x *= 64
+      x += 128
+      x = np.clip(x, 0, 255).astype('uint8')
+      display_grid[:, i * size : (i + 1) * size] = x
+      
+    # Display the grid
+    scale = 20. / n_features
+    plt.figure(figsize=(scale * n_features, scale))
+    plt.title(layer_name)
+    plt.grid(False)
+    plt.imshow(display_grid, aspect='auto', cmap='viridis')
+```
+
+### Interactive Predictions
+The notebook contains an interactive widget for uploading and classifying new images:
+
+![Prediction Widget](prediction-widget.png)
+*Example of the prediction widget interface*
+
+---
+
+
 ## Key Observations 🔍
 
 1. **Data Augmentation Impact**: Implementing augmentation increased validation accuracy from 85.6% to 91.8% without changing the model architecture
@@ -332,16 +342,6 @@ This approach demonstrates how modern deep learning can achieve state-of-the-art
 5. **Training Behavior**: The baseline model shows signs of overfitting after ~7 epochs (training accuracy at 100% while validation accuracy plateaus)
 
 ## Future Improvements 🚀
-
-- **Transfer Learning**: Leverage pre-trained models like VGG16, ResNet, or MobileNet as feature extractors
-  ```python
-  base_model = tf.keras.applications.MobileNetV2(
-      input_shape=(150, 150, 3),
-      include_top=False,
-      weights='imagenet'
-  )
-  base_model.trainable = False
-  ```
 
 - **Additional Regularization**: Further reduce overfitting with techniques beyond data augmentation
   ```python
@@ -359,14 +359,6 @@ This approach demonstrates how modern deep learning can achieve state-of-the-art
   - Experiment with various filter counts (16, 32, 64, 128)
   - Try different kernel sizes for convolutions (3×3, 5×5)
 
-- **Early Stopping**: Implement callbacks to halt training when validation accuracy plateaus
-  ```python
-  early_stopping = tf.keras.callbacks.EarlyStopping(
-      monitor='val_accuracy',
-      patience=3,
-      restore_best_weights=True
-  )
-  ```
 
 - **Learning Rate Scheduling**: Implement learning rate decay to fine-tune model convergence
   ```python
@@ -379,13 +371,8 @@ This approach demonstrates how modern deep learning can achieve state-of-the-art
 
 - **Class Activation Maps**: Implement Grad-CAM visualization to highlight which regions of images the model focuses on
 
-- **Model Deployment**: Convert to TensorFlow Lite for mobile applications or TensorFlow.js for web interfaces
 
 ---
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
 
 ## Acknowledgments 🙏
 
