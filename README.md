@@ -247,7 +247,7 @@ def create_transfer_learning_model(pre_trained_model, last_output):
 
 ### Performance Visualization
 
-![Transfer Learning Accuracy Curve](transfer-learning-accuracy.png)
+![Transfer Learning Accuracy Curve](transfer-learning-training-curve.png)
 
 The training curve above demonstrates the superior performance of the transfer learning approach:
 
