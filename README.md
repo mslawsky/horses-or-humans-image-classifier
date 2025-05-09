@@ -245,6 +245,19 @@ def create_transfer_learning_model(pre_trained_model, last_output):
 * **Minimal Custom Layers**: Just three additional layers are needed on top of the pre-trained model
 * **Specialized Preprocessing**: Images are prepared specifically for InceptionV3 using its dedicated preprocessing function
 
+### Performance Visualization
+
+![Transfer Learning Accuracy Curve](transfer-learning-accuracy.png)
+
+The training curve above demonstrates the superior performance of the transfer learning approach:
+
+* **Rapid Convergence**: The model reaches high accuracy after just 1-2 epochs
+* **Minimal Overfitting**: Note the small gap between training and validation accuracy
+* **Stability**: Validation accuracy remains consistently high without fluctuations
+* **Early Stopping**: Training automatically stops at < 5 epochs once 99.9% accuracy is reached
+
+Compared to the previous approaches, transfer learning demonstrates both faster training time and better final performance.
+
 **Performance Improvements:**
 * **Superior Accuracy**: 98.5% validation accuracy (6.7% improvement over the augmented model)
 * **Ultra-Fast Convergence**: Reaches optimal performance in less than 5 epochs
