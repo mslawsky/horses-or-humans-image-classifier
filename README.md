@@ -303,6 +303,7 @@ The repository includes code for various visualizations to help understand model
 
 ### Training Metrics
 ![Training Accuracy Curve](accuracy-curve.png)
+
 *Example visualization showing training and validation accuracy across epochs*
 
 ### Intermediate Layer Activations
